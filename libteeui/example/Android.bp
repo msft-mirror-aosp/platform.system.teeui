@@ -1,0 +1,16 @@
+cc_library_static {
+    name: "libteeui_example_layout",
+    defaults: ["keystore_defaults"],
+    srcs: [
+        "fonts.S",
+        "teeui.cpp",
+    ],
+    static_libs: [
+        "libft2.nodep",
+        "libteeui",
+    ],
+    host_supported: true,
+    cflags: [
+        "-ffunction-sections",
+    ],
+}
