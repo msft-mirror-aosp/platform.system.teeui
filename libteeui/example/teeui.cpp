@@ -14,16 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "layout.h"
+#include <cassert>
+#include <iostream>
+#include <localization/ConfirmationUITranslations.h>
 #include <teeui/example/teeui.h>
+#include <typeinfo>
 
 using namespace teeui;
 
-static uint32_t device_width_px;
-static uint32_t device_height_px;
-static double dp2px_;
-static double mm2px_;
+static DeviceInfo sDeviceInfo;
+static bool sMagnified;
 
 uint32_t alfaCombineChannel(uint32_t shift, double alfa, uint32_t a, uint32_t b) {
     a >>= shift;
@@ -41,18 +42,6 @@ template <typename T> uint32_t renderPixel(uint32_t x, uint32_t y, const T& e) {
     return e.bounds_.drawPoint(Point<pxs>(x, y));
 }
 
-template <typename... Elements>
-uint32_t renderPixel(uint32_t x, uint32_t y, const std::tuple<Elements...>& layout) {
-    uint32_t intensity = (x * 256) / device_width_px;
-    uint32_t acc = (intensity & 0xff) << 16 | (intensity & 0xff) << 8 | (intensity & 0xff);
-    for (uint32_t value : {renderPixel(x, y, std::get<Elements>(layout))...}) {
-        double alfa = (value & 0xff000000) >> 24;
-        alfa /= 255.0;
-        acc = alfaCombineChannel(0, alfa, value, acc) | alfaCombineChannel(8, alfa, value, acc) |
-              alfaCombineChannel(16, alfa, value, acc);
-    }
-    return acc;
-}
 
 struct FrameBuffer {
     uint32_t left_;
@@ -86,14 +75,27 @@ Error drawElements(std::tuple<Elements...>& layout, const PixelDrawer& drawPixel
     return (std::get<Elements>(layout).draw(drawPixel) || ...);
 }
 
-uint32_t setDeviceInfo(uint32_t width, uint32_t height, uint32_t colormodel, double dp2px,
-                       double mm2px) {
-    dp2px_ = dp2px;
-    mm2px_ = mm2px;
-    (void)colormodel;  // ignored for now;
-    device_width_px = width;
-    device_height_px = height;
+uint32_t setDeviceInfo(DeviceInfo deviceInfo, bool magnified) {
+    sDeviceInfo = deviceInfo;
+    sMagnified = magnified;
     return 0;
+}
+
+void selectLanguage(const char* language_id) {
+    ConfirmationUITranslations_select_lang_id(language_id);
+}
+
+void translate(LabelImpl* label) {
+    uint64_t textId = label->textId();
+    const char* translation = ConfirmationUITranslations_lookup(textId);
+    label->setText({&translation[0], &translation[strlen(translation)]});
+}
+
+template <typename... Elements> void translateLabels(std::tuple<Elements...>& layout) {
+    translate(&std::get<LabelOK>(layout));
+    translate(&std::get<LabelCancel>(layout));
+    translate(&std::get<LabelTitle>(layout));
+    translate(&std::get<LabelHint>(layout));
 }
 
 uint32_t renderUIIntoBuffer(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint32_t lineStride,
@@ -107,17 +109,24 @@ uint32_t renderUIIntoBuffer(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint
         afterLastPixelIndex > buffer_size_in_elements_not_bytes) {
         return uint32_t(Error::OutOfBoundsDrawing);
     }
-    context<ConUIParameters> conv(mm2px_, dp2px_);
-    conv.setParam<RightEdgeOfScreen>(pxs(device_width_px));
-    conv.setParam<BottomOfScreen>(pxs(device_height_px));
-    conv.setParam<PowerButtonTop>(100_dp);
-    conv.setParam<PowerButtonBottom>(150_dp);
-    conv.setParam<VolUpButtonTop>(200_dp);
-    conv.setParam<VolUpButtonBottom>(250_dp);
-    conv.setParam<DefaultFontSize>(14_dp);
-    conv.setParam<BodyFontSize>(16_dp);
+    context<ConUIParameters> conv(sDeviceInfo.mm2px_, sDeviceInfo.dp2px_);
+    conv.setParam<RightEdgeOfScreen>(pxs(sDeviceInfo.width_));
+    conv.setParam<BottomOfScreen>(pxs(sDeviceInfo.height_));
+    conv.setParam<PowerButtonTop>(mms(sDeviceInfo.powerButtonTopMm_));
+    conv.setParam<PowerButtonBottom>(mms(sDeviceInfo.powerButtonBottomMm_));
+    conv.setParam<VolUpButtonTop>(mms(sDeviceInfo.volUpButtonTopMm_));
+    conv.setParam<VolUpButtonBottom>(mms(sDeviceInfo.volUpButtonBottomMm_));
+    if (sMagnified) {
+        conv.setParam<DefaultFontSize>(18_dp);
+        conv.setParam<BodyFontSize>(20_dp);
+    } else {
+        conv.setParam<DefaultFontSize>(14_dp);
+        conv.setParam<BodyFontSize>(16_dp);
+    }
 
     auto layoutInstance = instantiateLayout(ConfUILayout(), conv);
+
+    translateLabels(layoutInstance);
 
     uint32_t* begin = buffer + (y * lineStride + x);
     for (uint32_t yi = 0; yi < h; ++yi) {

@@ -10,10 +10,12 @@ extern "C" {
 /*
  * Class:     com_android_framebufferizer_NativeRenderer
  * Method:    setDeviceInfo
- * Signature: (IIIDD)I
+ * Signature: (Lcom/android/framebufferizer/utils/DeviceInfo;Z)I
  */
-JNIEXPORT jint JNICALL Java_com_android_framebufferizer_NativeRenderer_setDeviceInfo(
-    JNIEnv*, jclass, jint, jint, jint, jdouble, jdouble);
+JNIEXPORT jint JNICALL Java_com_android_framebufferizer_NativeRenderer_setDeviceInfo(JNIEnv*,
+                                                                                     jclass,
+                                                                                     jobject,
+                                                                                     jboolean);
 
 /*
  * Class:     com_android_framebufferizer_NativeRenderer
@@ -22,6 +24,20 @@ JNIEXPORT jint JNICALL Java_com_android_framebufferizer_NativeRenderer_setDevice
  */
 JNIEXPORT jint JNICALL Java_com_android_framebufferizer_NativeRenderer_renderBuffer(
     JNIEnv*, jclass, jint, jint, jint, jint, jint, jintArray);
+
+/*
+ * Class:     com_android_framebufferizer_NativeRenderer_setLanguage
+ * Method:    setLanguage
+ * Signature: (Ljava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT void JNICALL Java_com_android_framebufferizer_NativeRenderer_setLanguage(JNIEnv*, jclass,
+                                                                                   jstring);
+/*
+ * Class:     com_android_framebufferizer_NativeRenderer_getLanguageIdList
+ * Method:    getLanguageIdList
+ */
+JNIEXPORT jobjectArray JNICALL
+Java_com_android_framebufferizer_NativeRenderer_getLanguageIdList(JNIEnv*, jclass);
 
 #ifdef __cplusplus
 }

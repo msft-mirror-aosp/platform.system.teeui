@@ -16,6 +16,7 @@
  */
 
 #include <jni.h>
+#include <localization/ConfirmationUITranslations.h>
 #include <teeui/example/teeui.h>
 
 /*
@@ -125,11 +126,29 @@ using JString = JArray<jstring>;
 /*
  * Class:     com_android_framebufferizer_NativeRenderer
  * Method:    setDeviceInfo
- * Signature: (IIIDD)I
+ * Signature: (Lcom/android/framebufferizer/utils/DeviceInfo;Z)I
  */
 extern "C" JNIEXPORT jint JNICALL Java_com_android_framebufferizer_NativeRenderer_setDeviceInfo(
-    JNIEnv*, jclass, jint width, jint height, jint colormodel, jdouble dp2px, jdouble mm2px) {
-    return setDeviceInfo(width, height, colormodel, dp2px, mm2px);
+    JNIEnv* env, jclass, jobject jDeviceInfo, jboolean magnified) {
+    jclass cDeviceInfo = env->FindClass("Lcom/android/framebufferizer/utils/DeviceInfo;");
+    jmethodID method = env->GetMethodID(cDeviceInfo, "getWidthPx", "()I");
+    DeviceInfo device_info;
+    device_info.width_ = env->CallIntMethod(jDeviceInfo, method);
+    method = env->GetMethodID(cDeviceInfo, "getHeightPx", "()I");
+    device_info.height_ = env->CallIntMethod(jDeviceInfo, method);
+    method = env->GetMethodID(cDeviceInfo, "getDp2px", "()D");
+    device_info.dp2px_ = env->CallDoubleMethod(jDeviceInfo, method);
+    method = env->GetMethodID(cDeviceInfo, "getMm2px", "()D");
+    device_info.mm2px_ = env->CallDoubleMethod(jDeviceInfo, method);
+    method = env->GetMethodID(cDeviceInfo, "getPowerButtonTopMm", "()D");
+    device_info.powerButtonTopMm_ = env->CallDoubleMethod(jDeviceInfo, method);
+    method = env->GetMethodID(cDeviceInfo, "getPowerButtonBottomMm", "()D");
+    device_info.powerButtonBottomMm_ = env->CallDoubleMethod(jDeviceInfo, method);
+    method = env->GetMethodID(cDeviceInfo, "getVolUpButtonTopMm", "()D");
+    device_info.volUpButtonTopMm_ = env->CallDoubleMethod(jDeviceInfo, method);
+    method = env->GetMethodID(cDeviceInfo, "getVolUpButtonBottomMm", "()D");
+    device_info.volUpButtonBottomMm_ = env->CallDoubleMethod(jDeviceInfo, method);
+    return setDeviceInfo(device_info, magnified);
 }
 
 /*
@@ -144,4 +163,34 @@ extern "C" JNIEXPORT jint JNICALL Java_com_android_framebufferizer_NativeRendere
     if (!buffer) return 1;
     return renderUIIntoBuffer((uint32_t)x, (uint32_t)y, (uint32_t)width, (uint32_t)height,
                               (uint32_t)lineStride, (uint32_t*)buffer.begin(), buffer.size());
+}
+/*
+ * Class:     com_android_framebufferizer_NativeRenderer_setLanguage
+ * Method:    setLanguage
+ */
+extern "C" JNIEXPORT void JNICALL
+Java_com_android_framebufferizer_NativeRenderer_setLanguage(JNIEnv* env, jclass, jstring jlang_id) {
+    jboolean isCopy = false;
+    const char* lang_id = (env)->GetStringUTFChars(jlang_id, &isCopy);
+    selectLanguage(lang_id);
+    (env)->ReleaseStringUTFChars(jlang_id, lang_id);
+}
+/*
+ * Class:     com_android_framebufferizer_NativeRenderer_getLanguageIdList
+ * Method:    getLanguageIdList
+ */
+extern "C" JNIEXPORT jobjectArray JNICALL
+Java_com_android_framebufferizer_NativeRenderer_getLanguageIdList(JNIEnv* env, jclass) {
+    jobjectArray language_ids;
+    languages lang_list = ConfirmationUITranslations_get_languages();
+    const char* const* native_data = lang_list.list;
+    size_t list_size = lang_list.size;
+
+    language_ids = (jobjectArray)env->NewObjectArray(list_size, env->FindClass("java/lang/String"),
+                                                     env->NewStringUTF(""));
+
+    for (size_t i = 0; i < list_size; i++)
+        env->SetObjectArrayElement(language_ids, i, env->NewStringUTF(native_data[i]));
+
+    return language_ids;
 }
