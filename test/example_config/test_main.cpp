@@ -1,4 +1,5 @@
 /*
+ *
  * Copyright 2020, The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,17 +15,8 @@
  * limitations under the License.
  */
 
-#pragma once
+#include "teeui_locale_test.h"
 
-#include <teeui/incfont.h>
-
-/*
- * Each entry TEEUI_INCFONT(<name>) declares:
- *    extern unsigned char <name>[];
- *    extern unsigned int <name>_length;
- * The first one pointing to a raw ttf font file in the .rodata section, and the second
- * beeing the size of the buffer.
- */
-TEEUI_INCFONT(RobotoMedium);
-TEEUI_INCFONT(RobotoRegular);
-TEEUI_INCFONT(Shield);
+int main(int argc, char** argv) {
+    return ::teeui::test::runAllTests(argc, argv);
+}
