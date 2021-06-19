@@ -18,29 +18,25 @@
 
 #include <teeui/button.h>
 #include <teeui/label.h>
-#include <teeui/utils.h>
+#include <teeui/localization/ConfirmationUITranslations.h>
 
-#include "fonts.h"
+#include "common_layout_params.h"
+
+using teeui::localization::TranslationId;
 
 namespace teeui {
+namespace example {
+namespace phys_button {
 
-DECLARE_PARAMETER(RightEdgeOfScreen);
-DECLARE_PARAMETER(BottomOfScreen);
 DECLARE_PARAMETER(PowerButtonTop);
 DECLARE_PARAMETER(PowerButtonBottom);
 DECLARE_PARAMETER(VolUpButtonTop);
 DECLARE_PARAMETER(VolUpButtonBottom);
-DECLARE_PARAMETER(DefaultFontSize);  // 14_dp regular and 18_dp magnified
-DECLARE_PARAMETER(BodyFontSize);     // 16_dp regular and 20_dp magnified
-DECLARE_TYPED_PARAMETER(ShieldColor, ::teeui::Color);
-DECLARE_TYPED_PARAMETER(ColorText, ::teeui::Color);
-DECLARE_TYPED_PARAMETER(ColorBG, ::teeui::Color);
 
 NEW_PARAMETER_SET(ConUIParameters, RightEdgeOfScreen, BottomOfScreen, PowerButtonTop,
                   PowerButtonBottom, VolUpButtonTop, VolUpButtonBottom, DefaultFontSize,
                   BodyFontSize, ShieldColor, ColorText, ColorBG);
 
-CONSTANT(BorderWidth, 24_dp);
 CONSTANT(PowerButtonCenter, (PowerButtonTop() + PowerButtonBottom()) / 2_px);
 CONSTANT(VolUpButtonCenter, (VolUpButtonTop() + VolUpButtonBottom()) / 2.0_px);
 CONSTANT(GrayZone, 12_dp);
@@ -56,12 +52,6 @@ CONSTANT(ARROW_SHAPE,
                         CONVEX_OBJECT(Vec2d{6.0_dp - SQRT8, 6.0_dp}, Vec2d{6.0_dp, 6.0_dp},
                                       Vec2d{0.0_dp, 12.0_dp}, Vec2d{-SQRT2, 12.0_dp - SQRT2})));
 
-DECLARE_FONT_BUFFER(RobotoMedium, RobotoMedium, RobotoMedium_length);
-DECLARE_FONT_BUFFER(RobotoRegular, RobotoRegular, RobotoRegular_length);
-DECLARE_FONT_BUFFER(Shield, Shield, Shield_length);
-
-CONSTANT(DefaultFont, FONT(RobotoRegular));
-
 BEGIN_ELEMENT(LabelOK, teeui::Label)
 FontSize(DefaultFontSize());
 LineHeight(20_dp);
@@ -73,7 +63,7 @@ RightJustified;
 VerticallyCentered;
 TextColor(ColorText());
 Font(FONT(RobotoMedium));
-TextID(1424834532030812203);
+TextID(TEXT_ID(TranslationId::CONFIRM_PWR_BUTTON_DOUBLE_PRESS));
 END_ELEMENT();
 
 BEGIN_ELEMENT(IconPower, teeui::Button, ConvexObjectCount(2))
@@ -98,7 +88,7 @@ RightJustified;
 VerticallyCentered;
 TextColor(ColorText());
 Font(FONT(RobotoMedium));
-TextID(1796282799666106567);
+TextID(TEXT_ID(TranslationId::CANCEL));
 END_ELEMENT();
 
 BEGIN_ELEMENT(IconVolUp, teeui::Button, ConvexObjectCount(2))
@@ -115,7 +105,7 @@ FontSize(24_dp);
 LineHeight(24_dp);
 NumberOfLines(1);
 Dimension(LabelWidth, HeightFromLines);
-Position(BorderWidth, BOTTOM_EDGE_OF(LabelCancel) + 60_dp);
+Position(BorderWidth, BOTTOM_EDGE_OF(LabelCancel) + 40_dp);
 DefaultText("A");  // ShieldTTF has just one glyph at the code point for capital A
 TextColor(ShieldColor());
 Font(FONT(Shield));
@@ -131,7 +121,7 @@ DefaultText("Android Protected Confirmation");
 Font(FONT(RobotoMedium));
 VerticallyCentered;
 TextColor(ColorText());
-TextID(6973195374358399966);
+TextID(TEXT_ID(TranslationId::TITLE));
 END_ELEMENT();
 
 BEGIN_ELEMENT(LabelHint, teeui::Label)
@@ -142,10 +132,10 @@ Dimension(LabelWidth, HeightFromLines);
 Position(BorderWidth, BottomOfScreen() - BorderWidth - dim_h);
 DefaultText("This confirmation provides an extra layer of security for the action you're "
             "about to take.");
-VerticallyCentered;
+VerticalTextAlignment(Alignment::BOTTOM);
 TextColor(ColorText());
 Font(DefaultFont);
-TextID(217688588483778177);
+TextID(TEXT_ID(TranslationId::DESCRIPTION));
 END_ELEMENT();
 
 BEGIN_ELEMENT(LabelBody, teeui::Label)
@@ -163,4 +153,6 @@ END_ELEMENT();
 NEW_LAYOUT(ConfUILayout, LabelOK, IconPower, LabelCancel, IconVolUp, IconShield, LabelTitle,
            LabelHint, LabelBody);
 
+}  // namespace phys_button
+}  // namespace example
 }  // namespace teeui
