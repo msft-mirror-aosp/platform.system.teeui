@@ -75,21 +75,10 @@ Error LabelImpl::draw(const PixelDrawer& drawPixel, const Box<pxs>& bounds, Line
             findLongestWordSequence(&face, text_t(*textBegin, *text_.end()), bounds);
         if (error) return error;
 
-        pen = {-bBox.x(), pen.y()};
-
-        // check horizontal justification to set pen value
-        switch (horizontalTextAlignment_) {
-        case Alignment::LEFT:
-        case Alignment::TOP:
-        case Alignment::BOTTOM:
-            break;
-        case Alignment::CENTER:
-            pen += {(bounds.w() - bBox.w()) / 2.0_px, 0};
-            break;
-        case Alignment::RIGHT:
-            pen += {bounds.w() - bBox.w(), 0};
-            break;
-        }
+        if (rightJustified_)
+            pen = {-bBox.w(), pen.y()};
+        else
+            pen = {-bBox.x(), pen.y()};
 
         curLine->lineStart = pen;
         bBox.translateSelf(pen);
@@ -104,17 +93,15 @@ Error LabelImpl::draw(const PixelDrawer& drawPixel, const Box<pxs>& bounds, Line
         ++curLine;
     }
 
-    if (!boundingBox) return Error::OK;
+    if (!boundingBox) return Error::BBoxComputation;
 
     TEEUI_LOG << "BoundingBox: " << *boundingBox << " Bounds: " << bounds << ENDL;
     Point<pxs> offset = bounds.topLeft();
     offset -= {0, boundingBox->y()};
     TEEUI_LOG << "Offset: " << offset << ENDL;
 
-    if (verticalTextAlignment_ == Alignment::CENTER)
-        offset += {0, (bounds.h() - boundingBox->h()) / 2.0_px};
-    else if (verticalTextAlignment_ == Alignment::BOTTOM)
-        offset += {0, (bounds.h() - boundingBox->h())};
+    if (rightJustified_) offset += {bounds.w(), 0};
+    if (verticallyCentered_) offset += {0, (bounds.h() - boundingBox->h()) / 2.0_px};
 
     auto lineEnd = curLine;
     curLine = lineInfo->begin();
@@ -136,14 +123,4 @@ Error LabelImpl::draw(const PixelDrawer& drawPixel, const Box<pxs>& bounds, Line
     return Error::OK;
 }
 
-Error LabelImpl::hit(const Event& event, const Box<pxs>& bounds) {
-    using intpxs = Coordinate<px, int64_t>;
-    if (bounds.contains(Point<intpxs>(event.x_, event.y_))) {
-        optional<CallbackEvent> callback = getCB();
-        if (callback) {
-            return callback.value()(event);
-        }
-    }
-    return Error::OK;
-}
 }  // namespace teeui

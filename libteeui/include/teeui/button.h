@@ -18,6 +18,7 @@
 #ifndef LIBTEEUI_BUTTON_H_
 #define LIBTEEUI_BUTTON_H_
 
+#include "font_rendering.h"
 #include "utils.h"
 
 // #define DRAW_DEBUG_MARKERS

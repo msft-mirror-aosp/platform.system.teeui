@@ -23,8 +23,7 @@ namespace test {
 // Initializes the test with the device configuration with command line params.
 extern void initRenderTest(int argc, char** argv);
 
-extern int runRenderTest(const char* language, bool magnified, bool inverted = false,
-                         const char* confirmationMessage = "", const char* layout = "");
+extern int runRenderTest(const char* language, bool magnified);
 
 }  // namespace test
 

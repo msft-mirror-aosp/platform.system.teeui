@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     com_android_framebufferizer_NativeRenderer
  * Method:    setDeviceInfo
- * Signature: (Lcom/android/framebufferizer/utils/DeviceInfo;ZZLjava/lang/String;)I
+ * Signature: (Lcom/android/framebufferizer/utils/DeviceInfo;ZZ)I
  */
 JNIEXPORT jint JNICALL Java_com_android_framebufferizer_NativeRenderer_setDeviceInfo(
-    JNIEnv*, jclass, jobject, jboolean, jboolean, jstring);
+    JNIEnv*, jclass, jobject, jboolean, jboolean);
 
 /*
  * Class:     com_android_framebufferizer_NativeRenderer
@@ -41,27 +41,11 @@ Java_com_android_framebufferizer_NativeRenderer_getLanguageIdList(JNIEnv*, jclas
 
 /*
  * Class:     com_android_framebufferizer_NativeRenderer
- * Method:    getAvailableLayouts
- * Signature: ()[Ljava/lang/String;
- */
-JNIEXPORT jobjectArray JNICALL
-Java_com_android_framebufferizer_NativeRenderer_getAvailableLayouts(JNIEnv*, jclass);
-
-/*
- * Class:     com_android_framebufferizer_NativeRenderer
  * Method:    setConfimationMessage
  * Signature: (Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL
 Java_com_android_framebufferizer_NativeRenderer_setConfimationMessage(JNIEnv*, jclass, jstring);
-
-/*
- * Class:     com_android_framebufferizer_NativeRenderer
- * Method:    onEvent
- * Signature: (III)I
- */
-JNIEXPORT jint JNICALL Java_com_android_framebufferizer_NativeRenderer_onEvent(JNIEnv*, jclass,
-                                                                               jint, jint, jint);
 
 #ifdef __cplusplus
 }
