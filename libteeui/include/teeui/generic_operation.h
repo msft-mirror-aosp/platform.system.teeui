@@ -166,7 +166,7 @@ template <typename Derived, typename TimeStamp> class Operation {
 
     bool isPending() const { return error_ != ResponseCode::Ignored; }
 
-    const MsgString getPrompt() const {
+    MsgString getPrompt() {
         return {&promptStringBuffer_[0], &promptStringBuffer_[strlen(promptStringBuffer_)]};
     }
 
