@@ -67,7 +67,7 @@ enum class TestModeCommands : uint64_t {
     CANCEL_EVENT = 1ull,
 };
 
-using MsgString = static_vec<const char>;
+using MsgString = static_vec<char>;
 template <typename T> using MsgVector = static_vec<T>;
 
 template <typename T> inline const uint8_t* copyField(T& field, const uint8_t*(&pos)) {
@@ -133,7 +133,7 @@ inline WriteStream write(WriteStream out, const MsgVector<uint8_t>& v) {
 
 // MsgString
 inline std::tuple<ReadStream, MsgString> read(Message<MsgString>, ReadStream in) {
-    return readSimpleVecInPlace<const char>(in);
+    return readSimpleVecInPlace<char>(in);
 }
 inline WriteStream write(WriteStream out, const MsgString& v) {
     return writeSimpleVec(out, v);
