@@ -13,7 +13,7 @@ java_binary_host {
         "json-prebuilt",
         "gson",
     ],
-    required: [
+    jni_libs: [
         "libteeui_jni",
     ]
 }
