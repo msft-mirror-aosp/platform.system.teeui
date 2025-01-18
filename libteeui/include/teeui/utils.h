@@ -177,11 +177,11 @@ using px = UnitT<Unit::PX>;
 using dp = UnitT<Unit::DP>;
 using mm = UnitT<Unit::MM>;
 
-template <typename Unit> static constexpr const char* str = "N/A";
+template <typename Unit> inline constexpr const char* str = "N/A";
 
-template <> static constexpr const char* str<px> = "px";
-template <> static constexpr const char* str<dp> = "dp";
-template <> static constexpr const char* str<mm> = "mm";
+template <> inline constexpr const char* str<px> = "px";
+template <> inline constexpr const char* str<dp> = "dp";
+template <> inline constexpr const char* str<mm> = "mm";
 
 using DefaultNumericType = float;
 
