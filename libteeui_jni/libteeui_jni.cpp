@@ -19,6 +19,8 @@
 #include <teeui/example/example.h>
 #include <teeui/localization/ConfirmationUITranslations.h>
 
+#include <memory>
+
 using teeui::localization::getLanguages;
 /*
  * JTypeTraits provides hints for JArray on how to access and free the array elements and how
